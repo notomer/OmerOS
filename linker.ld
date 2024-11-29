@@ -1,19 +1,19 @@
-ENTRY(_start)          /* Entry point: _start in bootloader.S */
+ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x80000;
+    . = 0x40000000;           /* Start address for code */
 
-    .text : ALIGN(4) {
-        *(.text)
+    .text : {
+        *(.text)           /* Include all .text sections */
     }
 
-    .data : ALIGN(4) {
-        *(.data)
+    .data : {
+        *(.data)           /* Include all .data sections */
     }
 
-    .bss : ALIGN(4) {
-        *(.bss)
-        *(COMMON)
+    .bss : {
+        *(.bss)            /* Include all .bss sections */
+        *(COMMON)          /* Include common symbols */
     }
 }

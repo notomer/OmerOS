@@ -1,28 +1,23 @@
-.global _start
-.section .text
+.global _start        // Define the global entry point
 
+.section .text        // Code section
 _start:
     // Disable interrupts
-    msr daifset, #0b111
+    msr daifset, #0b111      // Disable Debug, Async, IRQ, and FIQ interrupts
 
-    // Switch to EL1 (if not already in EL1)
-    mrs x0, CurrentEL
-    cmp x0, #0b0100      // Check if already in EL1
-    b.eq 1f
-    mov x0, #0x3C5       // Set HCR_EL2 for EL1 execution
-    msr HCR_EL2, x0
-    mov x0, #0x3C0
-    msr SCTLR_EL1, x0
-    eret                 // Return to EL1
+    // Set up the stack
+    ldr x0, =stack_top        // Load the address of the stack top
+    mov sp, x0                // Set the stack pointer
 
-1:  // Set up stack
-    ldr x0, =stack_top
-    mov sp, x0
-
-    // Call kernel
+    // Call kernel_main (defined in kernel.c)
     bl kernel_main
 
-    // Infinite loop
+    // Infinite loop to halt the system
 halt:
-    wfi
-    b halt
+    wfi                       // Wait for interrupt (low power mode)
+    b halt                    // Loop forever
+
+.section .bss                 // Uninitialized data section
+    .align 3                  // Ensure proper memory alignment (8-byte alignment for ARM64)
+stack_top:
+    .space 0x1000             // Reserve 4 KB for the stack
